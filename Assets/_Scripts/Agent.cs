@@ -2,79 +2,94 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using UnityEngine;
+using UnityEngine.Serialization;
 
+// Clase principal que controla las funciones básicas de un agente (personaje) en Unity.
 public class Agent : MonoBehaviour
 {
-    // Referencia al componente Rigidbody2D para manejar la física del agente.
+    // Referencia al Rigidbody2D para manejar las físicas del agente.
     public Rigidbody2D rb;
 
-    // Referencia al componente PlayerInput, que captura las entradas del jugador.
-    public PlayerInput playerInput;
+    // Referencia al sistema de entrada del jugador.
+    public PlayerInput agentInput;
 
-    // Referencia al administrador de animaciones del agente.
+    // Referencia al gestor de animaciones del agente.
     public AgentAnimation animationManager;
 
-    // Referencia al renderizador del agente, encargado de manejar la dirección visual del agente.
+    // Referencia al gestor de renderizado del agente, que maneja su orientación visual.
     public AgentRenderer agentRenderer;
+
+    // Estado actual del agente, y estado anterior.
+    public State currentState = null, previousState = null;
+
+    // Estado de reposo por defecto.
+    public State IdleState;
+
+    // Variable para depurar el nombre del estado actual en el Inspector.
+    [Header("State debugging:")] public string stateName = "";
 
     private void Awake()
     {
-        // Awake es llamado cuando se instancia el objeto y es ideal para inicializar referencias.
-        
-        // Obtiene el componente PlayerInput del objeto padre. Esto permite recibir las entradas del jugador.
-        playerInput = GetComponentInParent<PlayerInput>();
+        // Inicializa las referencias necesarias al iniciar el objeto.
+        agentInput = GetComponentInParent<PlayerInput>(); // Busca PlayerInput en el padre del objeto.
+        rb = GetComponent<Rigidbody2D>(); // Obtiene el Rigidbody2D del objeto actual.
+        animationManager = GetComponentInChildren<AgentAnimation>(); // Busca AgentAnimation en un hijo.
+        agentRenderer = GetComponentInChildren<AgentRenderer>(); // Busca AgentRenderer en un hijo.
+        IdleState = GetComponentInChildren<IdleState>();// Buscamos el IdleState en un hijo.
 
-        // Obtiene el componente Rigidbody2D en el mismo objeto. Esto es necesario para manipular el movimiento del agente.
-        rb = GetComponent<Rigidbody2D>();
-
-        // Obtiene el componente AgentAnimation en un objeto hijo. Este componente manejará las animaciones.
-        animationManager = GetComponentInChildren<AgentAnimation>();
-
-        // Obtiene el componente AgentRenderer en un objeto hijo. Este se encarga de ajustar la dirección visual del agente.
-        agentRenderer = GetComponentInChildren<AgentRenderer>();
+        // Obtiene todos los estados hijos de este agente y los inicializa.
+        State[] states = GetComponentsInChildren<State>();
+        foreach (var state in states)
+        {
+            state.InitializeState(this); // Pasa la referencia del agente a cada estado.
+        }
     }
 
     private void Start()
     {
-        // Start se llama después de Awake y es ideal para conectar eventos.
-
-        // Suscribe el método HandleMovement al evento OnMovement del PlayerInput.
-        // Esto permite que el agente reaccione a los movimientos del jugador.
-        playerInput.OnMovement += HandleMovement;
-
-        // También suscribe el método FaceDirection del AgentRenderer al mismo evento.
-        // Esto asegura que el agente gire visualmente en la dirección del movimiento.
-        playerInput.OnMovement += agentRenderer.FaceDirection;
+        // Suscribe métodos a eventos definidos en PlayerInput.
+        agentInput.OnMovement += agentRenderer.FaceDirection; // Ajusta la dirección visual del agente.
+        TransitionToState(IdleState); // Transición inicial al estado "Idle".
     }
 
-    private void HandleMovement(Vector2 input)
+    // Método para realizar la transición entre estados.
+    internal void TransitionToState(State targetState)
     {
-        // Este método maneja el movimiento del agente basado en la entrada del jugador.
+        if (targetState == null) return; // Si el estado objetivo es nulo, no hace nada.
 
-        // Comprueba si hay movimiento horizontal (input.x != 0).
-        if (Mathf.Abs(input.x) > 0)
+        // Llama al método Exit() del estado actual, si existe.
+        if (currentState != null)
         {
-            // Si el agente está casi detenido (velocidad horizontal cercana a 0), inicia la animación de correr.
-            if (Mathf.Abs(rb.velocity.x) < 0.01f)
-            {
-                animationManager.PlayAnimation(AnimationType.run);
-            }
-
-            // Ajusta la velocidad del Rigidbody2D para mover al agente en la dirección del input.x.
-            rb.velocity = new Vector2(input.x * 5, rb.velocity.y);
+            currentState.Exit();
         }
-        else
+
+        // Actualiza los estados.
+        previousState = currentState; // Guarda el estado actual como anterior.
+        currentState = targetState; // Actualiza el estado actual.
+        currentState.Enter(); // Llama al método Enter() del nuevo estado.
+
+        DisplayState(); // Actualiza el nombre del estado para depuración.
+    }
+
+    // Método para mostrar el nombre del estado actual (usado para depuración).
+    private void DisplayState()
+    {
+        if (previousState == null || previousState.GetType() != currentState.GetType())
         {
-            // Si no hay movimiento horizontal, pero el agente tiene velocidad, cambia la animación a "idle".
-            if (Mathf.Abs(rb.velocity.x) > 0f)
-            {
-                animationManager.PlayAnimation(AnimationType.idle);
-            }
-
-            // Detiene el movimiento horizontal del agente.
-            rb.velocity = new Vector2(0, rb.velocity.y);
+            stateName = currentState.GetType().ToString(); // Guarda el nombre del tipo de estado.
         }
+    }
+
+    private void Update()
+    {
+        // Actualiza el estado actual en cada frame.
+        currentState.StateUpdate();
+    }
+
+    private void FixedUpdate()
+    {
+        // Actualiza el estado actual en intervalos fijos (usado para cálculos de físicas).
+        currentState.StateFixedUpdate();
     }
 }
