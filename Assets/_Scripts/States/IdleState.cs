@@ -1,23 +1,42 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-// Estado "Idle" (reposo) del agente.
+/// <summary>
+/// Estado de reposo (Idle) del agente. 
+/// Define la lógica específica cuando el agente no está en movimiento.
+/// </summary>
 public class IdleState : State
 {
-    public State MoveState; // Referencia al estado de movimiento.
+    // Referencia al estado de movimiento.
+    public State moveState;
 
+    /// <summary>
+    /// Lógica específica al entrar al estado de reposo.
+    /// </summary>
     protected override void EnterState()
-    {    
-        agent.animationManager.PlayAnimation(AnimationType.idle); // Reproduce la animación de reposo.
+    {
+        // Reproduce la animación de reposo.
+        agent.animationManager.PlayAnimation(AnimationType.idle);
+
+        // Si el agente está tocando el suelo, detiene su movimiento estableciendo la velocidad en cero.
+        if (agent.groundDetector.isGrounded)
+        {
+            agent.rb.velocity = Vector2.zero;
+        }
     }
 
+    /// <summary>
+    /// Maneja la entrada de movimiento y transita al estado de movimiento si hay input horizontal.
+    /// </summary>
+    /// <param name="input">Vector de entrada de movimiento.</param>
     protected override void HandleMovement(Vector2 input)
     {
-        // Si detecta movimiento horizontal, transita al estado de movimiento.
         if (Mathf.Abs(input.x) > 0)
         {
-            agent.TransitionToState(MoveState);
+            // Si hay movimiento horizontal, transita al estado de movimiento.
+            agent.TransitionToState(moveState);
         }
     }
 }

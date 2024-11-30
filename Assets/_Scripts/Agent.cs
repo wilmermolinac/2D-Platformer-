@@ -5,58 +5,102 @@ using UnityEngine;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-// Clase principal que controla las funciones básicas de un agente (personaje) en Unity.
+/// <summary>
+/// Clase que controla las funciones básicas de un agente (personaje) en Unity.
+/// Actúa como núcleo del sistema de estados, manejando transiciones, entrada de jugador, físicas, y animaciones.
+/// </summary>
 public class Agent : MonoBehaviour
 {
-    // Referencia al Rigidbody2D para manejar las físicas del agente.
+    // **Datos compartidos**
+    // Referencia al ScriptableObject que almacena datos compartidos entre los estados del agente.
+    public AgentDataSO agentData;
+
+    // **Físicas**
+    // Referencia al Rigidbody2D del agente para manejar movimientos y fuerzas físicas.
     public Rigidbody2D rb;
 
-    // Referencia al sistema de entrada del jugador.
+    // **Entrada**
+    // Sistema que gestiona la entrada del jugador (movimiento, salto, ataque, etc.).
     public PlayerInput agentInput;
 
-    // Referencia al gestor de animaciones del agente.
+    // **Animaciones**
+    // Gestor que maneja las animaciones del agente.
     public AgentAnimation animationManager;
 
-    // Referencia al gestor de renderizado del agente, que maneja su orientación visual.
+    // **Renderizado**
+    // Gestor responsable de cambiar la orientación visual del agente según la dirección de movimiento.
     public AgentRenderer agentRenderer;
 
-    // Estado actual del agente, y estado anterior.
+    // **Detección de suelo**
+    // Clase que detecta si el agente está en contacto con el suelo.
+    public GroundDetector groundDetector;
+
+    // **Estados**
+    // Estado actual del agente y estado previo.
     public State currentState = null, previousState = null;
 
-    // Estado de reposo por defecto.
+    // Estado inicial por defecto: reposo (Idle).
     public State IdleState;
 
-    // Variable para depurar el nombre del estado actual en el Inspector.
-    [Header("State debugging:")] public string stateName = "";
+    // **Depuración**
+    // Almacena el nombre del estado actual para facilitar la depuración en el Inspector.
+    [Header("State debugging:")]
+    public string stateName = "";
 
+    /// <summary>
+    /// Método llamado al inicializar el objeto. Configura referencias necesarias.
+    /// </summary>
     private void Awake()
     {
-        // Inicializa las referencias necesarias al iniciar el objeto.
-        agentInput = GetComponentInParent<PlayerInput>(); // Busca PlayerInput en el padre del objeto.
-        rb = GetComponent<Rigidbody2D>(); // Obtiene el Rigidbody2D del objeto actual.
-        animationManager = GetComponentInChildren<AgentAnimation>(); // Busca AgentAnimation en un hijo.
-        agentRenderer = GetComponentInChildren<AgentRenderer>(); // Busca AgentRenderer en un hijo.
-        IdleState = GetComponentInChildren<IdleState>();// Buscamos el IdleState en un hijo.
+        // **Inicialización de referencias**
+        // Obtiene el sistema de entrada (PlayerInput) del padre del objeto actual.
+        agentInput = GetComponentInParent<PlayerInput>();
+        
+        // Obtiene el Rigidbody2D del objeto actual para manejar las físicas.
+        rb = GetComponent<Rigidbody2D>();
+        
+        // Obtiene el gestor de animaciones desde un hijo del agente.
+        animationManager = GetComponentInChildren<AgentAnimation>();
+        
+        // Obtiene el gestor de renderizado desde un hijo del agente.
+        agentRenderer = GetComponentInChildren<AgentRenderer>();
+        
+        // Obtiene el detector de suelo desde un hijo del agente.
+        groundDetector = GetComponentInChildren<GroundDetector>();
+        
+        // Busca y asigna el estado de reposo (IdleState) desde un hijo del agente.
+        IdleState = GetComponentInChildren<IdleState>();
 
-        // Obtiene todos los estados hijos de este agente y los inicializa.
+        // **Inicialización de estados**
+        // Obtiene todos los estados hijos y los inicializa pasando la referencia al agente.
         State[] states = GetComponentsInChildren<State>();
         foreach (var state in states)
         {
-            state.InitializeState(this); // Pasa la referencia del agente a cada estado.
+            state.InitializeState(this);
         }
     }
 
+    /// <summary>
+    /// Método llamado al inicio del juego. Configura eventos iniciales y el estado por defecto.
+    /// </summary>
     private void Start()
     {
-        // Suscribe métodos a eventos definidos en PlayerInput.
-        agentInput.OnMovement += agentRenderer.FaceDirection; // Ajusta la dirección visual del agente.
-        TransitionToState(IdleState); // Transición inicial al estado "Idle".
+        // **Suscripción de eventos**
+        // Ajusta la dirección visual del agente según el movimiento del jugador.
+        agentInput.OnMovement += agentRenderer.FaceDirection;
+        
+        // Transición inicial al estado de reposo (Idle).
+        TransitionToState(IdleState);
     }
 
-    // Método para realizar la transición entre estados.
+    /// <summary>
+    /// Realiza la transición entre estados del agente.
+    /// </summary>
+    /// <param name="targetState">El estado al que se quiere transitar.</param>
     internal void TransitionToState(State targetState)
     {
-        if (targetState == null) return; // Si el estado objetivo es nulo, no hace nada.
+        // Si el estado objetivo es nulo, no realiza la transición.
+        if (targetState == null) return;
 
         // Llama al método Exit() del estado actual, si existe.
         if (currentState != null)
@@ -64,32 +108,49 @@ public class Agent : MonoBehaviour
             currentState.Exit();
         }
 
-        // Actualiza los estados.
-        previousState = currentState; // Guarda el estado actual como anterior.
-        currentState = targetState; // Actualiza el estado actual.
-        currentState.Enter(); // Llama al método Enter() del nuevo estado.
+        // **Actualización de estados**
+        // Guarda el estado actual como el estado anterior.
+        previousState = currentState;
+        
+        // Actualiza el estado actual al nuevo estado.
+        currentState = targetState;
 
-        DisplayState(); // Actualiza el nombre del estado para depuración.
+        // Llama al método Enter() del nuevo estado.
+        currentState.Enter();
+
+        // Actualiza el nombre del estado para fines de depuración.
+        DisplayState();
     }
 
-    // Método para mostrar el nombre del estado actual (usado para depuración).
+    /// <summary>
+    /// Actualiza el nombre del estado actual para fines de depuración.
+    /// </summary>
     private void DisplayState()
     {
+        // Solo actualiza el nombre si el estado actual es diferente al estado anterior.
         if (previousState == null || previousState.GetType() != currentState.GetType())
         {
-            stateName = currentState.GetType().ToString(); // Guarda el nombre del tipo de estado.
+            stateName = currentState.GetType().ToString(); // Guarda el nombre del tipo del estado.
         }
     }
 
+    /// <summary>
+    /// Método llamado cada frame. Actualiza la lógica del estado actual.
+    /// </summary>
     private void Update()
     {
-        // Actualiza el estado actual en cada frame.
         currentState.StateUpdate();
     }
 
+    /// <summary>
+    /// Método llamado en intervalos fijos. Actualiza la lógica física del estado actual.
+    /// </summary>
     private void FixedUpdate()
     {
-        // Actualiza el estado actual en intervalos fijos (usado para cálculos de físicas).
+        // Comprueba si el agente está tocando el suelo.
+        groundDetector.CheckIsGrounded();
+
+        // Llama a la lógica física específica del estado actual.
         currentState.StateFixedUpdate();
     }
 }

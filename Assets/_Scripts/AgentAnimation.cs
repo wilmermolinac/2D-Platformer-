@@ -34,8 +34,10 @@ public class AgentAnimation : MonoBehaviour
                 Play("Run");
                 break;
             case AnimationType.jump: // Si el agente salta.
+                Play("Jump");
                 break;
             case AnimationType.fall: // Si el agente está cayendo.
+                Play("Fall");
                 break;
             case AnimationType.climb: // Si el agente está escalando.
                 break;
