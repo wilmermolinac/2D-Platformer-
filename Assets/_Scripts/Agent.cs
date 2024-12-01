@@ -34,13 +34,17 @@ public class Agent : MonoBehaviour
     // **Detección de suelo**
     // Clase que detecta si el agente está en contacto con el suelo.
     public GroundDetector groundDetector;
-
+    
+    // **Detector de escaleras**
+    // Hacemos la referencia al detector de escaleras.
+    public ClimbingDetector climbingDetector;
+    
     // **Estados**
     // Estado actual del agente y estado previo.
     public State currentState = null, previousState = null;
 
     // Estado inicial por defecto: reposo (Idle).
-    public State IdleState;
+    public State idleState;
 
     // **Depuración**
     // Almacena el nombre del estado actual para facilitar la depuración en el Inspector.
@@ -68,8 +72,11 @@ public class Agent : MonoBehaviour
         // Obtiene el detector de suelo desde un hijo del agente.
         groundDetector = GetComponentInChildren<GroundDetector>();
         
+        // Obtiene  y inicializa el detector de escaleras desde un hijo de agente
+        climbingDetector = GetComponentInChildren<ClimbingDetector>();
+        
         // Busca y asigna el estado de reposo (IdleState) desde un hijo del agente.
-        IdleState = GetComponentInChildren<IdleState>();
+        idleState = GetComponentInChildren<IdleState>();
 
         // **Inicialización de estados**
         // Obtiene todos los estados hijos y los inicializa pasando la referencia al agente.
@@ -90,7 +97,7 @@ public class Agent : MonoBehaviour
         agentInput.OnMovement += agentRenderer.FaceDirection;
         
         // Transición inicial al estado de reposo (Idle).
-        TransitionToState(IdleState);
+        TransitionToState(idleState);
     }
 
     /// <summary>

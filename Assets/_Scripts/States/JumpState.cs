@@ -9,6 +9,9 @@ using UnityEngine.Serialization;
 /// </summary>
 public class JumpState : MovementState
 {
+    // Hacemos referencia a nuestro estado ClimbingState;
+    [SerializeField] private State climbingState;
+
     // Variable para indicar si el botón de salto sigue presionado.
     private bool jumpPressed = false;
 
@@ -69,6 +72,12 @@ public class JumpState : MovementState
         if (agent.rb.velocity.y <= 0)
         {
             agent.TransitionToState(fallState); // Cambia al estado de caída.
+        }
+        else if (agent.climbingDetector.CanClimb && Mathf.Abs(agent.agentInput.MovementVector.y) > 0)
+        {
+            //Si podemos escalar y si estamos precionando las teclas verticales 
+            // Hacemos transicion al ClimbingState
+            agent.TransitionToState(climbingState);
         }
     }
 

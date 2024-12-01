@@ -9,8 +9,9 @@ using UnityEngine.Serialization;
 /// </summary>
 public class IdleState : State
 {
-    // Referencia al estado de movimiento.
+    // Referencia al estado de movimiento y al estado del Escalar.
     public State moveState;
+    public State climbingState;
 
     /// <summary>
     /// Lógica específica al entrar al estado de reposo.
@@ -33,7 +34,13 @@ public class IdleState : State
     /// <param name="input">Vector de entrada de movimiento.</param>
     protected override void HandleMovement(Vector2 input)
     {
-        if (Mathf.Abs(input.x) > 0)
+        if (agent.climbingDetector.CanClimb && Mathf.Abs(input.y) > 0)
+        {
+            // si podemos escalar y el valor absoluto de la entrada de Y (Vertical) es mayor que 0
+            // Hacemos la transicion al climbState
+            agent.TransitionToState(climbingState);
+        }
+        else if (Mathf.Abs(input.x) > 0)
         {
             // Si hay movimiento horizontal, transita al estado de movimiento.
             agent.TransitionToState(moveState);

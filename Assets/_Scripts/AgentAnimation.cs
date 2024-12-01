@@ -40,6 +40,7 @@ public class AgentAnimation : MonoBehaviour
                 Play("Fall");
                 break;
             case AnimationType.climb: // Si el agente está escalando.
+                Play("Climbing");
                 break;
             case AnimationType.land: // Si el agente aterriza tras un salto.
                 break;
@@ -51,7 +52,18 @@ public class AgentAnimation : MonoBehaviour
     public void Play(string name)
     {
         // Reproduce la animación especificada por su nombre.
-        _animator.Play(name, -1, 0f); // "-1" significa reproducir la animación en su capa base, "0f" reinicia la animación.
+        _animator.Play(name, -1,
+            0f); // "-1" significa reproducir la animación en su capa base, "0f" reinicia la animación.
+    }
+
+    internal void StopAnimation()
+    {
+        _animator.enabled = false;
+    }
+    
+    internal void StartAnimation()
+    {
+        _animator.enabled = true;
     }
 }
 

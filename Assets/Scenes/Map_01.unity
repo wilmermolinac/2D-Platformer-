@@ -369,6 +369,7 @@ GameObject:
   - component: {fileID: 214764835}
   - component: {fileID: 214764836}
   - component: {fileID: 214764837}
+  - component: {fileID: 214764838}
   m_Layer: 15
   m_Name: GroundCollider
   m_TagString: Untagged
@@ -449,6 +450,22 @@ MonoBehaviour:
   boxCastHeight: 0.25
   gizmoColorNotGrounded: {r: 1, g: 0, b: 0, a: 1}
   gizmoColorIsGrounded: {r: 0, g: 1, b: 0, a: 1}
+--- !u!114 &214764838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 214764834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1eddba05facb94db4a0a1ed013224d8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  climbingLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
+  canClimb: 0
 --- !u!1 &424771555
 GameObject:
   m_ObjectHideFlags: 0
@@ -475,7 +492,7 @@ Transform:
   m_GameObject: {fileID: 424771555}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.32, y: -1.23, z: 0}
+  m_LocalPosition: {x: 35.95, y: -1.15, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -514,6 +531,7 @@ GameObject:
   - component: {fileID: 466809706}
   - component: {fileID: 466809707}
   - component: {fileID: 466809708}
+  - component: {fileID: 466809709}
   m_Layer: 0
   m_Name: States
   m_TagString: Untagged
@@ -557,6 +575,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   moveState: {fileID: 466809706}
+  climbingState: {fileID: 466809709}
 --- !u!114 &466809706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -601,6 +620,7 @@ MonoBehaviour:
       m_Calls: []
   movementData: {fileID: 0}
   idleState: {fileID: 466809705}
+  climbingState: {fileID: 466809709}
 --- !u!114 &466809708
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -623,6 +643,27 @@ MonoBehaviour:
       m_Calls: []
   movementData: {fileID: 0}
   idleState: {fileID: 466809705}
+  climbingState: {fileID: 466809709}
+--- !u!114 &466809709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 466809703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 596ddcf803b6845189450a4ab7c31522, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpState: {fileID: 466809707}
+  fallState: {fileID: 466809708}
+  OnEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  OnExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &476811455
 GameObject:
   m_ObjectHideFlags: 0
@@ -7386,9 +7427,10 @@ MonoBehaviour:
   animationManager: {fileID: 0}
   agentRenderer: {fileID: 0}
   groundDetector: {fileID: 0}
+  climbingDetector: {fileID: 0}
   currentState: {fileID: 0}
   previousState: {fileID: 0}
-  IdleState: {fileID: 0}
+  idleState: {fileID: 0}
   stateName: 
 --- !u!114 &689570372
 MonoBehaviour:
@@ -9469,7 +9511,7 @@ Transform:
   m_GameObject: {fileID: 854245161}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.32, y: -1.23, z: -10}
+  m_LocalPosition: {x: 35.95, y: -1.15, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9753,7 +9795,7 @@ Transform:
   m_GameObject: {fileID: 1104138378}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.025503635, y: -0.18231, z: -10}
+  m_LocalPosition: {x: 35.955383, y: -0.25066, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

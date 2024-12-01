@@ -8,6 +8,9 @@ using UnityEngine;
 /// </summary>
 public class FallState : MovementState
 {
+    // Hacemos referencia al estado ClimbingState
+    [SerializeField] private State climbingState;
+    
     /// <summary>
     /// Método que se ejecuta cuando el agente entra en el estado de caída.
     /// </summary>
@@ -50,6 +53,11 @@ public class FallState : MovementState
         if (agent.groundDetector.isGrounded)
         {
             agent.TransitionToState(idleState);
+        }else if (agent.climbingDetector.CanClimb && Mathf.Abs(agent.agentInput.MovementVector.y) > 0)
+        {
+            //Si podemos escalar y si estamos precionando las teclas verticales 
+            // Hacemos transicion al ClimbingState
+            agent.TransitionToState(climbingState);
         }
     }
 }
