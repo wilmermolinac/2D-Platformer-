@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 /// <summary>
@@ -34,11 +35,11 @@ public class Agent : MonoBehaviour
     // **Detección de suelo**
     // Clase que detecta si el agente está en contacto con el suelo.
     public GroundDetector groundDetector;
-    
+
     // **Detector de escaleras**
     // Hacemos la referencia al detector de escaleras.
     public ClimbingDetector climbingDetector;
-    
+
     // **Estados**
     // Estado actual del agente y estado previo.
     public State currentState = null, previousState = null;
@@ -48,8 +49,10 @@ public class Agent : MonoBehaviour
 
     // **Depuración**
     // Almacena el nombre del estado actual para facilitar la depuración en el Inspector.
-    [Header("State debugging:")]
-    public string stateName = "";
+    [Header("State debugging:")] public string stateName = "";
+
+    // Evento que se llama cuando vamos a reaparecer
+    [field: SerializeField] private UnityEvent OnRespawnRequired { get; set; }
 
     /// <summary>
     /// Método llamado al inicializar el objeto. Configura referencias necesarias.
@@ -59,22 +62,22 @@ public class Agent : MonoBehaviour
         // **Inicialización de referencias**
         // Obtiene el sistema de entrada (PlayerInput) del padre del objeto actual.
         agentInput = GetComponentInParent<PlayerInput>();
-        
+
         // Obtiene el Rigidbody2D del objeto actual para manejar las físicas.
         rb = GetComponent<Rigidbody2D>();
-        
+
         // Obtiene el gestor de animaciones desde un hijo del agente.
         animationManager = GetComponentInChildren<AgentAnimation>();
-        
+
         // Obtiene el gestor de renderizado desde un hijo del agente.
         agentRenderer = GetComponentInChildren<AgentRenderer>();
-        
+
         // Obtiene el detector de suelo desde un hijo del agente.
         groundDetector = GetComponentInChildren<GroundDetector>();
-        
+
         // Obtiene  y inicializa el detector de escaleras desde un hijo de agente
         climbingDetector = GetComponentInChildren<ClimbingDetector>();
-        
+
         // Busca y asigna el estado de reposo (IdleState) desde un hijo del agente.
         idleState = GetComponentInChildren<IdleState>();
 
@@ -95,7 +98,7 @@ public class Agent : MonoBehaviour
         // **Suscripción de eventos**
         // Ajusta la dirección visual del agente según el movimiento del jugador.
         agentInput.OnMovement += agentRenderer.FaceDirection;
-        
+
         // Transición inicial al estado de reposo (Idle).
         TransitionToState(idleState);
     }
@@ -118,7 +121,7 @@ public class Agent : MonoBehaviour
         // **Actualización de estados**
         // Guarda el estado actual como el estado anterior.
         previousState = currentState;
-        
+
         // Actualiza el estado actual al nuevo estado.
         currentState = targetState;
 
@@ -159,5 +162,11 @@ public class Agent : MonoBehaviour
 
         // Llama a la lógica física específica del estado actual.
         currentState.StateFixedUpdate();
+    }
+
+    public void AgentDied()
+    {
+        OnRespawnRequired?.Invoke();
+
     }
 }
