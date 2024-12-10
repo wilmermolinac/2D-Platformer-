@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using RespawnSystem;
 using UnityEngine;
 
 /// <summary>
@@ -9,11 +10,12 @@ using UnityEngine;
 public class DestroyFallingObjects : MonoBehaviour
 {
     public LayerMask objectToDestroyLayerMask; // Máscara de capas para los objetos que deben eliminarse.
-    public Vector2 size;                      // Tamaño del área de detección.
+    public Vector2 size; // Tamaño del área de detección.
 
     [Header("Gizmos parameters")]
-    public Color gizmoColor = Color.red;      // Color del Gizmo que muestra el área en el editor.
-    public bool showGizmo = true;             // Controla si el Gizmo se muestra en el editor.
+    public Color gizmoColor = Color.red; // Color del Gizmo que muestra el área en el editor.
+
+    public bool showGizmo = true; // Controla si el Gizmo se muestra en el editor.
 
     /// <summary>
     /// Método llamado en cada FixedUpdate para detectar y eliminar objetos.
@@ -34,6 +36,25 @@ public class DestroyFallingObjects : MonoBehaviour
                 Destroy(collider.gameObject);
                 return;
             }
+
+            // Obtenemos el componente Damagable
+            var damagable = agent.GetComponent<Damagable>();
+            // si es diferente de nulo
+            if (damagable != null)
+            {                                                                                                                    
+                // Descontamos una vida
+                damagable.GetHit(1);
+                
+                // Si la vida actual es igual a 0 y si agente collisionado es un Player
+                if (damagable.CurrentHealth == 0 && agent.CompareTag("Player"))
+                {
+                    // Obtenemos el componente RespawnHelper en el player
+                    // Reaparecemos el player en la ultimo RespawnPoint
+                    agent.GetComponent<RespawnHelper>().RespawnPlayer();
+                }
+            }
+
+           
 
             // Si es un agente, llama al método que maneja su destrucción.
             agent.AgentDied();

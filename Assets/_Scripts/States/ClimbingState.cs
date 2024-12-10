@@ -20,7 +20,7 @@ public class ClimbingState : State
     protected override void EnterState()
     {
         // Reproduce la animación de escalada.
-        agent.animationManager.PlayAnimation(AnimationType.climb);
+        agent.animationManager.PlayAnimation(AnimationType.Climb);
 
         // Detiene cualquier otra animación que estuviera activa.
         agent.animationManager.StopAnimation();
@@ -41,7 +41,7 @@ public class ClimbingState : State
     protected override void HandleJumpPressed()
     {
         // Transición al estado de salto si el jugador presiona el botón de salto.
-        agent.TransitionToState(jumpState);
+        agent.TransitionToState(agent.stateFactory.GetState(StateType.Jump));
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public class ClimbingState : State
         if (agent.climbingDetector.CanClimb == false)
         {
             // Transición al estado de reposo (Idle).
-            agent.TransitionToState(agent.idleState);
+            agent.TransitionToState(agent.stateFactory.GetState(StateType.Idle));
         }
     }
 
@@ -86,5 +86,10 @@ public class ClimbingState : State
 
         // Reanuda cualquier animación que estuviera activa.
         agent.animationManager.StartAnimation();
+    }
+
+    protected override void HandleAttack()
+    {
+        // Prevent Attack
     }
 }

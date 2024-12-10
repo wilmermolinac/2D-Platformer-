@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 
@@ -14,8 +15,7 @@ public class MovementState : State
     // Referencia a los datos de movimiento, que incluyen velocidad y dirección.
     [SerializeField] protected MovementData movementData;
 
-    // Referencia al estado de reposo del agente.
-    public State idleState;
+    public UnityEvent OnStep;
 
     /// <summary>
     /// Método que se ejecuta al inicializar el estado de movimiento.
@@ -32,7 +32,11 @@ public class MovementState : State
     protected override void EnterState()
     {
         // Activa la animación de correr.
-        agent.animationManager.PlayAnimation(AnimationType.run);
+        agent.animationManager.PlayAnimation(AnimationType.Run);
+
+        agent.animationManager.OnAnimationAction.AddListener(() =>
+            OnStep?.Invoke()
+        );
 
         // Reinicia los datos de movimiento a sus valores iniciales.
         movementData.horizontalMovementDirection = 0;
@@ -60,7 +64,7 @@ public class MovementState : State
         // Si la velocidad horizontal es cercana a cero, cambia al estado de reposo.
         if (Mathf.Abs(agent.rb.velocity.x) < 0.01f)
         {
-            agent.TransitionToState(idleState);
+            agent.TransitionToState(agent.stateFactory.GetState(StateType.Idle));
         }
     }
 
@@ -126,5 +130,10 @@ public class MovementState : State
 
         // Limita la velocidad entre 0 y el valor máximo permitido.
         movementData.currentSpeed = Mathf.Clamp(movementDat.currentSpeed, 0, agent.agentData.maxSpeed);
+    }
+
+    protected override void ExitState()
+    {
+        agent.animationManager.ResetEvents();
     }
 }

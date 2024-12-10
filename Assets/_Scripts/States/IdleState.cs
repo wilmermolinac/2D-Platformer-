@@ -9,17 +9,14 @@ using UnityEngine.Serialization;
 /// </summary>
 public class IdleState : State
 {
-    // Referencia al estado de movimiento y al estado del Escalar.
-    public State moveState;
-    public State climbingState;
-
+    
     /// <summary>
     /// Lógica específica al entrar al estado de reposo.
     /// </summary>
     protected override void EnterState()
     {
         // Reproduce la animación de reposo.
-        agent.animationManager.PlayAnimation(AnimationType.idle);
+        agent.animationManager.PlayAnimation(AnimationType.Idle);
 
         // Si el agente está tocando el suelo, detiene su movimiento estableciendo la velocidad en cero.
         if (agent.groundDetector.isGrounded)
@@ -38,12 +35,12 @@ public class IdleState : State
         {
             // si podemos escalar y el valor absoluto de la entrada de Y (Vertical) es mayor que 0
             // Hacemos la transicion al climbState
-            agent.TransitionToState(climbingState);
+            agent.TransitionToState(agent.stateFactory.GetState(StateType.Climbing));
         }
         else if (Mathf.Abs(input.x) > 0)
         {
             // Si hay movimiento horizontal, transita al estado de movimiento.
-            agent.TransitionToState(moveState);
+            agent.TransitionToState(agent.stateFactory.GetState(StateType.Move));
         }
     }
 }

@@ -16,9 +16,6 @@ using UnityEngine.Events;
 /// </summary>
 public abstract class State : MonoBehaviour
 {
-    // Referencias a posibles estados de salto y caída.
-    [SerializeField] protected State jumpState, fallState;
-
     // Referencia al agente asociado con este estado.
     protected Agent agent;
 
@@ -55,18 +52,24 @@ public abstract class State : MonoBehaviour
     /// <summary>
     /// Método virtual que puede ser sobrescrito para agregar lógica específica al entrar al estado.
     /// </summary>
-    protected virtual void EnterState() { }
+    protected virtual void EnterState()
+    {
+    }
 
     /// <summary>
     /// Maneja la entrada de movimiento del jugador.
     /// </summary>
     /// <param name="input">Vector de entrada de movimiento.</param>
-    protected virtual void HandleMovement(Vector2 input) { }
+    protected virtual void HandleMovement(Vector2 input)
+    {
+    }
 
     /// <summary>
     /// Método llamado cuando se libera el botón de salto.
     /// </summary>
-    protected virtual void HandleJumpReleased() { }
+    protected virtual void HandleJumpReleased()
+    {
+    }
 
     /// <summary>
     /// Método llamado cuando se presiona el botón de salto.
@@ -85,14 +88,17 @@ public abstract class State : MonoBehaviour
         if (agent.groundDetector.isGrounded)
         {
             // Si el agente está tocando el suelo, transita al estado de salto.
-            agent.TransitionToState(jumpState);
+            agent.TransitionToState(agent.stateFactory.GetState(StateType.Jump));
         }
     }
 
     /// <summary>
     /// Método llamado cuando se presiona el botón de ataque.
     /// </summary>
-    protected virtual void HandleAttack() { }
+    protected virtual void HandleAttack()
+    {
+        TestAttackTransition();
+    }
 
     /// <summary>
     /// Método que se llama en cada frame para actualizar la lógica del estado.
@@ -112,7 +118,7 @@ public abstract class State : MonoBehaviour
         if (!agent.groundDetector.isGrounded)
         {
             // Si el agente no está tocando el suelo, transita al estado de caída.
-            agent.TransitionToState(fallState);
+            agent.TransitionToState(agent.stateFactory.GetState(StateType.Fall));
             return true;
         }
 
@@ -122,7 +128,30 @@ public abstract class State : MonoBehaviour
     /// <summary>
     /// Método virtual llamado para actualizar la lógica física del estado.
     /// </summary>
-    public virtual void StateFixedUpdate() { }
+    public virtual void StateFixedUpdate()
+    {
+    }
+    
+    protected virtual void TestAttackTransition()
+    {
+        if (agent.agentWeaponManager.CanIUseWeapon(agent.groundDetector.isGrounded))
+        {
+            agent.TransitionToState(agent.stateFactory.GetState(StateType.Attack));
+        }
+    }
+
+    public virtual void GetHit()
+    {
+        // Hacemos la trasicion al estado GetHit
+        agent.TransitionToState(agent.stateFactory.GetState(StateType.GetHit));
+    }
+
+    public virtual void Die()
+    {
+        // Hacemos la trancision al estado Die
+        agent.TransitionToState(agent.stateFactory.GetState(StateType.Die));
+    }
+    
 
     /// <summary>
     /// Método que se llama cuando el agente sale de este estado.
@@ -145,5 +174,8 @@ public abstract class State : MonoBehaviour
     /// <summary>
     /// Método virtual que puede ser sobrescrito para agregar lógica específica al salir del estado.
     /// </summary>
-    protected virtual void ExitState() { }
+    protected virtual void ExitState()
+    {
+    }
+    
 }

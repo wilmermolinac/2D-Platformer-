@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
+using WeaponSystem; // Hacemos la importaccion del namespace WeaponSystem para usar sus clases
 
 /// <summary>
 /// Clase que controla las funciones básicas de un agente (personaje) en Unity.
@@ -45,15 +46,25 @@ public class Agent : MonoBehaviour
     public State currentState = null, previousState = null;
 
     // Estado inicial por defecto: reposo (Idle).
-    public State idleState;
+    [SerializeField] private State _idleState;
+
+    // Hacemos referencia al AgentWeaponManager
+    [HideInInspector] public AgentWeaponManager agentWeaponManager;
+
+    [SerializeField] public StateFactory stateFactory;
+
+    private Damagable _damagable;
 
     // **Depuración**
     // Almacena el nombre del estado actual para facilitar la depuración en el Inspector.
     [Header("State debugging:")] public string stateName = "";
+    
+    public UnityEvent OnAgentDie { get; set; }
 
     // Evento que se llama cuando vamos a reaparecer
-    [field: SerializeField] private UnityEvent OnRespawnRequired { get; set; }
-
+    [field: SerializeField] 
+    private UnityEvent OnRespawnRequired { get; set; }
+    
     /// <summary>
     /// Método llamado al inicializar el objeto. Configura referencias necesarias.
     /// </summary>
@@ -79,15 +90,19 @@ public class Agent : MonoBehaviour
         climbingDetector = GetComponentInChildren<ClimbingDetector>();
 
         // Busca y asigna el estado de reposo (IdleState) desde un hijo del agente.
-        idleState = GetComponentInChildren<IdleState>();
+        _idleState = GetComponentInChildren<IdleState>();
 
-        // **Inicialización de estados**
-        // Obtiene todos los estados hijos y los inicializa pasando la referencia al agente.
-        State[] states = GetComponentsInChildren<State>();
-        foreach (var state in states)
-        {
-            state.InitializeState(this);
-        }
+        // Iniclializamos
+        agentWeaponManager = GetComponentInChildren<AgentWeaponManager>();
+
+        // Inicializamos
+        stateFactory = GetComponentInChildren<StateFactory>();
+
+        // Inicializamos 
+        _damagable = GetComponent<Damagable>();
+
+        // Inicializamos todos los States
+        stateFactory.InitializeStates(this);
     }
 
     /// <summary>
@@ -99,8 +114,15 @@ public class Agent : MonoBehaviour
         // Ajusta la dirección visual del agente según el movimiento del jugador.
         agentInput.OnMovement += agentRenderer.FaceDirection;
 
+        // Inicializamos algunos datos
+        InitializeAgent();
+    }
+
+    private void InitializeAgent()
+    {
         // Transición inicial al estado de reposo (Idle).
-        TransitionToState(idleState);
+        TransitionToState(_idleState);
+        _damagable.Initialize(agentData.health);
     }
 
     /// <summary>
@@ -166,7 +188,18 @@ public class Agent : MonoBehaviour
 
     public void AgentDied()
     {
-        OnRespawnRequired?.Invoke();
+        if (_damagable.CurrentHealth > 0)
+        {
+            OnRespawnRequired?.Invoke();
+        }
+        else
+        {
+            currentState.Die();
+        }
+    }
 
+    public void GetHit()
+    {
+        currentState.GetHit();
     }
 }

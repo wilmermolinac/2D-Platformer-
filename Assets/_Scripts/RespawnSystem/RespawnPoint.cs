@@ -22,7 +22,7 @@ namespace RespawnSystem
         private void Start()
         {
             // Agrega un listener al evento OnSpawnPointActivated para que actualice automáticamente
-            // el punto de reaparición en el RespawnPointManager. Esto elimina la necesidad de configurarlo manualmente.
+            // el punto de reaparición en el RespawnPointManager. Esto elimina la necesidad de configurarlo manualmente desde el inspector.
             OnSpawnPointActivated.AddListener(() =>
                 GetComponentInParent<RespawnPointManager>().UpdateRespawnPoint(this)
             );
