@@ -50,15 +50,15 @@ public class ClimbingState : State
     public override void StateUpdate()
     {
         // Si el jugador proporciona entrada de movimiento.
-        if (agent.agentInput.MovementVector.magnitude > 0)
+        if (agent.iaAgentInput.MovementVector.magnitude > 0)
         {
             // Reanuda la animación de escalada.
             agent.animationManager.StartAnimation();
 
             // Actualiza la velocidad del personaje según la dirección y las velocidades configuradas.
             agent.rb.velocity = new Vector2(
-                agent.agentInput.MovementVector.x * agent.agentData.climbHorizontalSpeed,
-                agent.agentInput.MovementVector.y * agent.agentData.climbVerticalSpeed
+                agent.iaAgentInput.MovementVector.x * agent.agentData.climbHorizontalSpeed,
+                agent.iaAgentInput.MovementVector.y * agent.agentData.climbVerticalSpeed
             );
         }
         else

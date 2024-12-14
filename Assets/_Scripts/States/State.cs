@@ -37,10 +37,10 @@ public abstract class State : MonoBehaviour
     public void Enter()
     {
         // Suscribe los métodos correspondientes a los eventos del sistema de entrada del agente.
-        this.agent.agentInput.OnAttack += HandleAttack;
-        this.agent.agentInput.OnJumpPressed += HandleJumpPressed;
-        this.agent.agentInput.OnJumpReleased += HandleJumpReleased;
-        this.agent.agentInput.OnMovement += HandleMovement;
+        this.agent.iaAgentInput.OnAttack += HandleAttack;
+        this.agent.iaAgentInput.OnJumpPressed += HandleJumpPressed;
+        this.agent.iaAgentInput.OnJumpReleased += HandleJumpReleased;
+        this.agent.iaAgentInput.OnMovement += HandleMovement;
 
         // Invoca el evento OnEnter si está configurado.
         OnEnter?.Invoke();
@@ -159,10 +159,10 @@ public abstract class State : MonoBehaviour
     public void Exit()
     {
         // Elimina la suscripción de los eventos del sistema de entrada del agente.
-        this.agent.agentInput.OnAttack -= HandleAttack;
-        this.agent.agentInput.OnJumpPressed -= HandleJumpPressed;
-        this.agent.agentInput.OnJumpReleased -= HandleJumpReleased;
-        this.agent.agentInput.OnMovement -= HandleMovement;
+        this.agent.iaAgentInput.OnAttack -= HandleAttack;
+        this.agent.iaAgentInput.OnJumpPressed -= HandleJumpPressed;
+        this.agent.iaAgentInput.OnJumpReleased -= HandleJumpReleased;
+        this.agent.iaAgentInput.OnMovement -= HandleMovement;
 
         // Invoca el evento OnExit si está configurado.
         OnExit?.Invoke();

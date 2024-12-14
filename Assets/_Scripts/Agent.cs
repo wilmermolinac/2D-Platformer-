@@ -22,8 +22,8 @@ public class Agent : MonoBehaviour
     public Rigidbody2D rb;
 
     // **Entrada**
-    // Sistema que gestiona la entrada del jugador (movimiento, salto, ataque, etc.).
-    public PlayerInput agentInput;
+    // Hacemos referencia a IAgentInput inteface de nuestro Sistema que gestiona los eventos de la entrada del jugador (movimiento, salto, ataque, etc.).
+    public IAAgentInput iaAgentInput;
 
     // **Animaciones**
     // Gestor que maneja las animaciones del agente.
@@ -59,11 +59,12 @@ public class Agent : MonoBehaviour
     // Almacena el nombre del estado actual para facilitar la depuración en el Inspector.
     [Header("State debugging:")] public string stateName = "";
     
-    public UnityEvent OnAgentDie { get; set; }
-
     // Evento que se llama cuando vamos a reaparecer
     [field: SerializeField] 
     private UnityEvent OnRespawnRequired { get; set; }
+    
+    [field:SerializeField]
+    public UnityEvent OnAgentDie { get; set; }
     
     /// <summary>
     /// Método llamado al inicializar el objeto. Configura referencias necesarias.
@@ -71,8 +72,8 @@ public class Agent : MonoBehaviour
     private void Awake()
     {
         // **Inicialización de referencias**
-        // Obtiene el sistema de entrada (PlayerInput) del padre del objeto actual.
-        agentInput = GetComponentInParent<PlayerInput>();
+        // Obtiene el sistema de entrada (IAgentInput) del padre del objeto actual.
+        iaAgentInput = GetComponentInParent<IAAgentInput>();
 
         // Obtiene el Rigidbody2D del objeto actual para manejar las físicas.
         rb = GetComponent<Rigidbody2D>();
@@ -108,11 +109,11 @@ public class Agent : MonoBehaviour
     /// <summary>
     /// Método llamado al inicio del juego. Configura eventos iniciales y el estado por defecto.
     /// </summary>
-    private void Start()
+    private void Start() 
     {
         // **Suscripción de eventos**
         // Ajusta la dirección visual del agente según el movimiento del jugador.
-        agentInput.OnMovement += agentRenderer.FaceDirection;
+        iaAgentInput.OnMovement += agentRenderer.FaceDirection;
 
         // Inicializamos algunos datos
         InitializeAgent();

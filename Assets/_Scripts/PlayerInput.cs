@@ -8,11 +8,12 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 
+
 /// <summary>
 /// Clase encargada de gestionar la entrada del jugador y emitir eventos relacionados con las acciones del juego.
 /// Hereda de MonoBehaviour, lo que permite asociarla a un GameObject en Unity.
 /// </summary>
-public class PlayerInput : MonoBehaviour
+public class PlayerInput : MonoBehaviour, IAAgentInput
 {
     // **Movimiento**
     /// <summary>
@@ -28,7 +29,7 @@ public class PlayerInput : MonoBehaviour
 
     /// <summary>Se activa cuando el jugador presiona el botón de salto.</summary>
     public event Action OnJumpPressed;
-
+    
     /// <summary>Se activa cuando el jugador suelta el botón de salto.</summary>
     public event Action OnJumpReleased;
 

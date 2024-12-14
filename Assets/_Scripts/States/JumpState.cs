@@ -70,7 +70,7 @@ public class JumpState : MovementState
         {
             agent.TransitionToState(agent.stateFactory.GetState(StateType.Fall)); // Cambia al estado de caída.
         }
-        else if (agent.climbingDetector.CanClimb && Mathf.Abs(agent.agentInput.MovementVector.y) > 0)
+        else if (agent.climbingDetector.CanClimb && Mathf.Abs(agent.iaAgentInput.MovementVector.y) > 0)
         {
             //Si podemos escalar y si estamos precionando las teclas verticales 
             // Hacemos transicion al ClimbingState

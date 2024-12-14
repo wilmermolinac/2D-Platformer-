@@ -306,7 +306,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d6c96df52e2e456ba71620f4995fd81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clip: {fileID: 8300000, guid: 2d9784548ba836e43b4c5722046222cb, type: 3}
+  clip: {fileID: 0}
   targetAudioSource: {fileID: 2522191689591744314}
   volume: 1
 --- !u!1 &3434308976388559506
@@ -590,9 +590,9 @@ GameObject:
   - component: {fileID: 5025602297673341515}
   - component: {fileID: 6373695631273475475}
   - component: {fileID: 8142012034056171216}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: Agent
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -654,9 +654,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a84377eb14bd14fb1aa629a321d53e8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentData: {fileID: 11400000, guid: 56fc15c1250cc467cba499ea7781666c, type: 2}
+  agentData: {fileID: 0}
   rb: {fileID: 0}
-  agentInput: {fileID: 0}
   animationManager: {fileID: 0}
   agentRenderer: {fileID: 0}
   groundDetector: {fileID: 0}
@@ -682,6 +681,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  <OnAgentDie>k__BackingField:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &5025602297673341515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1082,7 +1084,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d6c96df52e2e456ba71620f4995fd81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clip: {fileID: 8300000, guid: f25b087c805825847b8e4c620d9bc989, type: 3}
+  clip: {fileID: 0}
   targetAudioSource: {fileID: 2522191689591744314}
   volume: 1
 --- !u!1 &8962540253443019497

@@ -82,7 +82,7 @@ public class MovementState : State
     protected void CalculateVelocity()
     {
         // Calcula la velocidad en función de la dirección y el input horizontal.
-        CalculateSpeed(agent.agentInput.MovementVector, movementData);
+        CalculateSpeed(agent.iaAgentInput.MovementVector, movementData);
 
         // Determina la dirección horizontal según el input.
         CalculateHorizontalDirection(movementData);
@@ -100,12 +100,12 @@ public class MovementState : State
     /// </summary>
     protected void CalculateHorizontalDirection(MovementData movementDat)
     {
-        if (agent.agentInput.MovementVector.x > 0)
+        if (agent.iaAgentInput.MovementVector.x > 0)
         {
             // Si el input es positivo, el agente se mueve a la derecha.
             movementDat.horizontalMovementDirection = 1;
         }
-        else if (agent.agentInput.MovementVector.x < 0)
+        else if (agent.iaAgentInput.MovementVector.x < 0)
         {
             // Si el input es negativo, el agente se mueve a la izquierda.
             movementDat.horizontalMovementDirection = -1;

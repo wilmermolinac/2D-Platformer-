@@ -51,7 +51,7 @@ public class FallState : MovementState
         if (agent.groundDetector.isGrounded)
         {
             agent.TransitionToState(agent.stateFactory.GetState(StateType.Idle));
-        }else if (agent.climbingDetector.CanClimb && Mathf.Abs(agent.agentInput.MovementVector.y) > 0)
+        }else if (agent.climbingDetector.CanClimb && Mathf.Abs(agent.iaAgentInput.MovementVector.y) > 0)
         {
             //Si podemos escalar y si estamos precionando las teclas verticales 
             // Hacemos transicion al ClimbingState
